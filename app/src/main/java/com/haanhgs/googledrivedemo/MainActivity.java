@@ -133,10 +133,8 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Pair<String, String> nameAndContent) {
                             String name = nameAndContent.first;
                             String content = nameAndContent.second;
-
                             etTitle.setText(name);
                             etContent.setText(content);
-
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -262,20 +260,6 @@ public class MainActivity extends AppCompatActivity {
 
         super.onActivityResult(requestCode, resultCode, resultData);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
