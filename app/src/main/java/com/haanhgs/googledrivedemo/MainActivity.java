@@ -27,8 +27,6 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-
-import java.net.URL;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
