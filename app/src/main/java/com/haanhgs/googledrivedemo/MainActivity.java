@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         GoogleSignInOptions signInOptions = new GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
+                .requestScopes(new Scope(DriveScopes.DRIVE_APPDATA))
                 .build();
         client = GoogleSignIn.getClient(this, signInOptions);
         // The result of the sign-in Intent is handled in onActivityResult.
@@ -146,6 +146,40 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Queries the Drive REST API for files visible to this app and lists them in the content view.
+     */
+    private void query() {
+        if (helper != null) {
+            Log.d(TAG, "Querying for files.");
+
+            helper.queryFiles()
+                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
+                        @Override
+                        public void onSuccess(FileList fileList) {
+                            StringBuilder builder = new StringBuilder();
+                            for (File file : fileList.getFiles()) {
+                                builder.append(file.getName()).append("\n");
+                            }
+                            String fileNames = builder.toString();
+
+                            etTitle.setText(String.format("%s", "File List"));
+                            etContent.setText(fileNames);
+
+//                            MainActivity.this.setReadOnlyMode();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.e(TAG, "Unable to query files.", exception);
+                        }
+                    });
+        }
+    }
+
+
+
     private void logout(){
         client.signOut();
     }
@@ -188,6 +222,7 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.query();
             }
         });
+
         findViewById(R.id.bnLogout).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -216,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
                         GoogleAccountCredential credential =
                                 GoogleAccountCredential.usingOAuth2(
                                         MainActivity.this,
-                                        Collections.singleton(DriveScopes.DRIVE_FILE));
+                                        Collections.singleton(DriveScopes.DRIVE_APPDATA));
                         credential.setSelectedAccount(googleAccount.getAccount());
                         Drive googleDriveService = new Drive.Builder(
                                 AndroidHttp.newCompatibleTransport(),
@@ -306,37 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    /**
-     * Queries the Drive REST API for files visible to this app and lists them in the content view.
-     */
-    private void query() {
-        if (helper != null) {
-            Log.d(TAG, "Querying for files.");
 
-            helper.queryFiles()
-                    .addOnSuccessListener(new OnSuccessListener<FileList>() {
-                        @Override
-                        public void onSuccess(FileList fileList) {
-                            StringBuilder builder = new StringBuilder();
-                            for (File file : fileList.getFiles()) {
-                                builder.append(file.getName()).append("\n");
-                            }
-                            String fileNames = builder.toString();
-
-                            etTitle.setText(String.format("%s", "File List"));
-                            etContent.setText(fileNames);
-
-                            MainActivity.this.setReadOnlyMode();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            Log.e(TAG, "Unable to query files.", exception);
-                        }
-                    });
-        }
-    }
 
 
 

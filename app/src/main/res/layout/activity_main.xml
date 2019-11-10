@@ -52,7 +52,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/open" />
+            android:text="@string/open"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/bnCreate"
@@ -60,7 +61,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/create" />
+            android:text="@string/create"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/bnSave"
@@ -68,15 +70,17 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/save" />
+            android:text="@string/save"
+            android:textSize="12sp" />
 
-<!--        <Button-->
-<!--            android:id="@+id/bnQuery"-->
-<!--            style="?attr/buttonBarButtonStyle"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_weight="1"-->
-<!--            android:text="@string/query" />-->
+        <Button
+            android:id="@+id/bnQuery"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/query"
+            android:textSize="12sp" />
 
         <Button
             android:id="@+id/bnLogout"
@@ -84,7 +88,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/signout" />
+            android:text="@string/signout"
+            android:textSize="12sp" />
 
     </LinearLayout>
 
