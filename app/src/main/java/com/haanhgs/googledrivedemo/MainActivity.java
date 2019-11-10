@@ -7,9 +7,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -47,9 +50,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void requestSignIn() {
         Log.d(TAG, "Requesting sign-in");
-        GoogleSignInOptions signInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignInOptions signInOptions = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
-                .requestScopes(new Scope(DriveScopes.DRIVE_APPDATA))
+                .requestScopes(new Scope(DriveScopes.DRIVE_FILE))
                 .build();
         client = GoogleSignIn.getClient(this, signInOptions);
         // The result of the sign-in Intent is handled in onActivityResult.
@@ -138,7 +142,8 @@ public class MainActivity extends AppCompatActivity {
                         // Use the authenticated account to sign in to the Drive service.
                         GoogleAccountCredential credential =
                                 GoogleAccountCredential.usingOAuth2(
-                                        MainActivity.this, Collections.singleton(DriveScopes.DRIVE_APPDATA));
+                                        MainActivity.this,
+                                        Collections.singleton(DriveScopes.DRIVE_FILE));
                         credential.setSelectedAccount(googleAccount.getAccount());
                         Drive googleDriveService = new Drive.Builder(
                                 AndroidHttp.newCompatibleTransport(),
@@ -177,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
      * Opens a file from its {@code uri} returned from the Storage Access Framework file picker
      * initiated by {@link #openFilePicker()}.
      */
-    private void openFileFromFilePicker(Uri uri) {
+    private void openFileFromFilePicker(final Uri uri) {
         if (helper != null) {
             Log.d(TAG, "Opening " + uri.getPath());
             helper.openFileUsingStorageAccessFramework(getContentResolver(), uri)
@@ -186,12 +191,11 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Pair<String, String> nameAndContent) {
                             String name = nameAndContent.first;
                             String content = nameAndContent.second;
-
                             etTitle.setText(name);
                             etContent.setText(content);
 
                             // Files opened through SAF cannot be modified.
-                            MainActivity.this.setReadOnlyMode();
+
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -209,19 +213,34 @@ public class MainActivity extends AppCompatActivity {
     private void createFile() {
         if (helper != null) {
             Log.d(TAG, "Creating a file.");
-            helper.createFile("appDataFolder")
-                    .addOnSuccessListener(new OnSuccessListener<String>() {
-                        @Override
-                        public void onSuccess(String fileId) {
-                            MainActivity.this.readFile(fileId);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            Log.e(TAG, "Couldn't create file.", exception);
-                        }
-                    });
+            String filename;
+            if (!TextUtils.isEmpty(etTitle.getText())) {
+                filename = etTitle.getText().toString();
+                helper.createFile(filename)
+                        .addOnSuccessListener(new OnSuccessListener<String>() {
+                            @Override
+                            public void onSuccess(String fileId) {
+                                helper.saveFile(fileId,
+                                        etTitle.getText().toString(),
+                                        etContent.getText().toString())
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e(TAG, "Couldn't read file.", e);
+                                            }
+                                        });
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                Log.e(TAG, "Couldn't create file.", exception);
+                            }
+                        });
+            }else {
+                Toast.makeText(this, "empty filename", Toast.LENGTH_SHORT).show();
+            }
+
         }
     }
 

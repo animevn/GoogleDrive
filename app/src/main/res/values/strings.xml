@@ -5,4 +5,6 @@
     <string name="save">Save</string>
     <string name="query">Query</string>
     <string name="signout">Logout</string>
+    <string name="hintName">Filename</string>
+    <string name="hintContent">Content</string>
 </resources>

@@ -15,7 +15,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -48,14 +50,14 @@ public class DriveServiceHelper {
         });
     }
 
-    public Task<String> createFile(final String folderId) {
+    public Task<String> createFile(final String filename) {
         return Tasks.call(executor, new Callable<String>() {
             @Override
             public String call() throws Exception {
                 File metadata = new File()
-                        .setParents(Collections.singletonList(folderId))
+                        .setParents(Collections.singletonList("root"))
                         .setMimeType("text/plain")
-                        .setName("test");
+                        .setName(filename);
 
                 File googleFile = driveService.files().create(metadata).execute();
                 if (googleFile == null) {
@@ -63,27 +65,6 @@ public class DriveServiceHelper {
                 }
 
                 return googleFile.getId();
-            }
-        });
-    }
-
-    public Task<Pair<String, String>> readFile(final String fileId) {
-        return Tasks.call(executor, new Callable<Pair<String, String>>() {
-            @Override
-            public Pair<String, String> call() throws Exception {
-                File metadata = driveService.files().get(fileId).execute();
-                String name = metadata.getName();
-                // Stream the file contents to a String.
-                try (InputStream is = driveService.files().get(fileId).executeMediaAsInputStream();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
-                    StringBuilder stringBuilder = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        stringBuilder.append(line);
-                    }
-                    String contents = stringBuilder.toString();
-                    return Pair.create(name, contents);
-                }
             }
         });
     }
@@ -109,6 +90,31 @@ public class DriveServiceHelper {
         });
     }
 
+
+
+    public Task<Pair<String, String>> readFile(final String fileId) {
+        return Tasks.call(executor, new Callable<Pair<String, String>>() {
+            @Override
+            public Pair<String, String> call() throws Exception {
+                File metadata = driveService.files().get(fileId).execute();
+                String name = metadata.getName();
+                // Stream the file contents to a String.
+                try (InputStream is = driveService.files().get(fileId).executeMediaAsInputStream();
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        stringBuilder.append(line);
+                    }
+                    String contents = stringBuilder.toString();
+                    return Pair.create(name, contents);
+                }
+            }
+        });
+    }
+
+
+
     /**
      * Returns a {@link FileList} containing all the visible files in the user's My Drive.
      *
@@ -121,7 +127,9 @@ public class DriveServiceHelper {
         return Tasks.call(executor, new Callable<FileList>() {
             @Override
             public FileList call() throws Exception {
-                return driveService.files().list().setSpaces("appDataFolder").execute();
+                return driveService.files().list()
+                        .setSpaces("drive")
+                        .execute();
             }
         });
     }
@@ -133,7 +141,6 @@ public class DriveServiceHelper {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("text/plain");
-
         return intent;
     }
 
@@ -147,6 +154,7 @@ public class DriveServiceHelper {
         return Tasks.call(executor, new Callable<Pair<String, String>>() {
             @Override
             public Pair<String, String> call() throws Exception {
+
                 // Retrieve the document's display name from its metadata.
                 String name;
                 try (Cursor cursor = contentResolver.query(uri, null, null, null, null)) {
@@ -157,7 +165,6 @@ public class DriveServiceHelper {
                         throw new IOException("Empty cursor returned for file.");
                     }
                 }
-
 
                 // Read the document's contents as a String.
                 String content;
