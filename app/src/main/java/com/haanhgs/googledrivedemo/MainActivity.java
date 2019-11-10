@@ -28,6 +28,7 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
+import java.net.URL;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(Pair<String, String> nameAndContent) {
                             String name = nameAndContent.first;
                             String content = nameAndContent.second;
-                            etTitle.setText(name);
+                            etTitle.setText(uri.toString());
                             etContent.setText(content);
 
                             // Files opened through SAF cannot be modified.
