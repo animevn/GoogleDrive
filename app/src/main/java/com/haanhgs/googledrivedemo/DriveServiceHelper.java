@@ -168,8 +168,10 @@ public class DriveServiceHelper {
 
                 // Read the document's contents as a String.
                 String content;
-                try (InputStream is = contentResolver.openInputStream(uri);
-                     BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                try (
+                        InputStream is = contentResolver.openInputStream(uri);
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(is))
+                ) {
                     StringBuilder stringBuilder = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
