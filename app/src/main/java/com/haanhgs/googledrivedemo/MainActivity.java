@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -38,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient client;
     private DriveServiceHelper helper;
+    private String fileID;
     private String openFileID;
 
     private EditText etTitle;
@@ -59,6 +59,99 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(client.getSignInIntent(), REQUEST_CODE_SIGN_IN);
     }
 
+    /**
+     * Creates a new file via the Drive REST API.
+     */
+    private void createFile() {
+        if (helper != null) {
+            Log.d(TAG, "Creating a file.");
+            String filename;
+            if (!TextUtils.isEmpty(etTitle.getText())) {
+                filename = etTitle.getText().toString();
+                helper.createFile(filename)
+                        .addOnSuccessListener(new OnSuccessListener<String>() {
+                            @Override
+                            public void onSuccess(String fileId) {
+                                helper.saveFile(fileId,
+                                        etTitle.getText().toString(),
+                                        etContent.getText().toString())
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Log.e(TAG, "Couldn't read file.", e);
+                                            }
+                                        });
+                                MainActivity.this.fileID = fileId;
+                                etTitle.setText("");
+                                etContent.setText("");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception exception) {
+                                Log.e(TAG, "Couldn't create file.", exception);
+                            }
+                        });
+            }else {
+                Toast.makeText(this, "empty filename", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+
+    private void saveFile() {
+        if (helper != null && fileID != null) {
+            Log.d(TAG, "Saving " + fileID);
+
+            String fileName = etTitle.getText().toString();
+            String fileContent = etContent.getText().toString();
+
+            helper.saveFile(fileID, fileName, fileContent)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            etTitle.setText("");
+                            etContent.setText("");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.e(TAG, "Unable to save file via REST.", exception);
+                        }
+                    });
+        }
+    }
+
+    private void readFile() {
+        if (helper != null) {
+            Log.d(TAG, "Reading file " + fileID);
+
+            helper.readFile(fileID)
+                    .addOnSuccessListener(new OnSuccessListener<Pair<String, String>>() {
+                        @Override
+                        public void onSuccess(Pair<String, String> nameAndContent) {
+                            String name = nameAndContent.first;
+                            String content = nameAndContent.second;
+
+                            etTitle.setText(name);
+                            etContent.setText(content);
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            Log.e(TAG, "Couldn't read file.", exception);
+                        }
+                    });
+        }
+    }
+
+    private void logout(){
+        client.signOut();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,24 +162,28 @@ public class MainActivity extends AppCompatActivity {
         etContent = findViewById(R.id.etContent);
 
         // Set the onClick listeners for the button bar.
-        findViewById(R.id.bnOpen).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainActivity.this.openFilePicker();
-            }
-        });
+
         findViewById(R.id.bnCreate).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                MainActivity.this.createFile();
+                createFile();
             }
         });
+
+        findViewById(R.id.bnOpen).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                readFile();
+            }
+        });
+
         findViewById(R.id.bnSave).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 MainActivity.this.saveFile();
             }
         });
+
         findViewById(R.id.bnQuery).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,27 +202,6 @@ public class MainActivity extends AppCompatActivity {
         requestSignIn();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-        switch (requestCode) {
-            case REQUEST_CODE_SIGN_IN:
-                if (resultCode == Activity.RESULT_OK && resultData != null) {
-                    handleSignInResult(resultData);
-                }
-                break;
-
-            case REQUEST_CODE_OPEN_DOCUMENT:
-                if (resultCode == Activity.RESULT_OK && resultData != null) {
-                    Uri uri = resultData.getData();
-                    if (uri != null) {
-                        openFileFromFilePicker(uri);
-                    }
-                }
-                break;
-        }
-
-        super.onActivityResult(requestCode, resultCode, resultData);
-    }
 
     /**
      * Handles the {@code result} of a completed sign-in activity initiated from {@link
@@ -163,6 +239,44 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        switch (requestCode) {
+            case REQUEST_CODE_SIGN_IN:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    handleSignInResult(resultData);
+                }
+                break;
+
+            case REQUEST_CODE_OPEN_DOCUMENT:
+                if (resultCode == Activity.RESULT_OK && resultData != null) {
+                    Uri uri = resultData.getData();
+                    if (uri != null) {
+                        openFileFromFilePicker(uri);
+                    }
+                }
+                break;
+        }
+
+        super.onActivityResult(requestCode, resultCode, resultData);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     /**
@@ -206,91 +320,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Creates a new file via the Drive REST API.
-     */
-    private void createFile() {
-        if (helper != null) {
-            Log.d(TAG, "Creating a file.");
-            String filename;
-            if (!TextUtils.isEmpty(etTitle.getText())) {
-                filename = etTitle.getText().toString();
-                helper.createFile(filename)
-                        .addOnSuccessListener(new OnSuccessListener<String>() {
-                            @Override
-                            public void onSuccess(String fileId) {
-                                helper.saveFile(fileId,
-                                        etTitle.getText().toString(),
-                                        etContent.getText().toString())
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                Log.e(TAG, "Couldn't read file.", e);
-                                            }
-                                        });
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                Log.e(TAG, "Couldn't create file.", exception);
-                            }
-                        });
-            }else {
-                Toast.makeText(this, "empty filename", Toast.LENGTH_SHORT).show();
-            }
 
-        }
-    }
-
-    /**
-     * Retrieves the title and content of a file identified by {@code fileId} and populates the UI.
-     */
-    private void readFile(final String fileId) {
-        if (helper != null) {
-            Log.d(TAG, "Reading file " + fileId);
-
-            helper.readFile(fileId)
-                    .addOnSuccessListener(new OnSuccessListener<Pair<String, String>>() {
-                        @Override
-                        public void onSuccess(Pair<String, String> nameAndContent) {
-                            String name = nameAndContent.first;
-                            String content = nameAndContent.second;
-
-                            etTitle.setText(name);
-                            etContent.setText(content);
-
-                            MainActivity.this.setReadWriteMode(fileId);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            Log.e(TAG, "Couldn't read file.", exception);
-                        }
-                    });
-        }
-    }
-
-    /**
-     * Saves the currently opened file created via {@link #createFile()} if one exists.
-     */
-    private void saveFile() {
-        if (helper != null && openFileID != null) {
-            Log.d(TAG, "Saving " + openFileID);
-
-            String fileName = etTitle.getText().toString();
-            String fileContent = etContent.getText().toString();
-
-            helper.saveFile(openFileID, fileName, fileContent)
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-                            Log.e(TAG, "Unable to save file via REST.", exception);
-                        }
-                    });
-        }
-    }
 
     /**
      * Queries the Drive REST API for files visible to this app and lists them in the content view.
@@ -324,9 +354,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void logout(){
-        client.signOut();
-    }
+
 
     /**
      * Updates the UI to read-only mode.
