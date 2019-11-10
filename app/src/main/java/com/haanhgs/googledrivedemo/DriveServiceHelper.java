@@ -36,7 +36,7 @@ public class DriveServiceHelper {
             public String call() throws Exception {
                 File metadata = new File()
                         .setMimeType("application/vnd.google-apps.folder")
-                        .setName("DriveDemo");
+                        .setName("Drive Demo");
 
                 File googleFile = driveService.files().create(metadata).execute();
                 if (googleFile == null) {

@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
                         // Use the authenticated account to sign in to the Drive service.
                         GoogleAccountCredential credential =
                                 GoogleAccountCredential.usingOAuth2(
-                                        MainActivity.this, Collections.singleton(DriveScopes.DRIVE_FILE));
+                                        MainActivity.this, Collections.singleton(DriveScopes.DRIVE_APPDATA));
                         credential.setSelectedAccount(googleAccount.getAccount());
                         Drive googleDriveService = new Drive.Builder(
                                 AndroidHttp.newCompatibleTransport(),
