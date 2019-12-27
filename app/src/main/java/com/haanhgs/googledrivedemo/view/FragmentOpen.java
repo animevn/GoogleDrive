@@ -5,10 +5,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.helper.DriveServiceHelper;
-import com.haanhgs.googledrivedemo.view.FileAdapter;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
 
 import androidx.annotation.NonNull;
@@ -16,16 +16,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class FragmentOpen extends Fragment {
 
     @BindView(R.id.rvOpenFiles)
     RecyclerView rvOpenFiles;
+    @BindView(R.id.bnCreate)
+    Button bnCreate;
 
     private DriveServiceHelper helper;
     private FragmentActivity activity;
@@ -63,5 +67,19 @@ public class FragmentOpen extends Fragment {
         rvOpenFiles.setLayoutManager(new LinearLayoutManager(context));
         rvOpenFiles.setAdapter(adapter);
         return view;
+    }
+
+    private void openCreate(){
+        FragmentTransaction ft = manager.beginTransaction();
+        FragmentCreate fragmentCreate = new FragmentCreate();
+        fragmentCreate.setHelper(helper);
+        ft.replace(R.id.flMain, fragmentCreate, "create");
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    @OnClick(R.id.bnCreate)
+    public void onViewClicked(){
+        openCreate();
     }
 }

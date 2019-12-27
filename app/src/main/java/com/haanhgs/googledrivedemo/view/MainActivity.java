@@ -18,32 +18,6 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();
     }
 
-//    private void saveFileWhenCreated(String fileId) {
-//        String title = etTitle.getText().toString();
-//        String content = etContent.getText().toString();
-//        helper.saveFile(fileId, title, content).addOnFailureListener(e ->
-//                Log.e(TAG, "Couldn't read file.", e));
-//        this.fileID = fileId;
-//        etTitle.setText("");
-//        etContent.setText("");
-//    }
-
-//    private void createFile() {
-//        if (helper != null) {
-//            Log.d(TAG, "Creating a file.");
-//            String filename;
-//            if (!TextUtils.isEmpty(etTitle.getText())) {
-//                filename = etTitle.getText().toString();
-//                helper.createFile(filename)
-//                        .addOnSuccessListener(this::saveFileWhenCreated)
-//                        .addOnFailureListener(exception ->
-//                                Log.e(TAG, "Couldn't create file.", exception));
-//            } else {
-//                Toast.makeText(this, "empty filename", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
-
 
 //    private void openFilePicker() {
 //        if (helper != null) {
@@ -52,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 //            startActivityForResult(pickerIntent, OPEN_DOCUMENT);
 //        }
 //    }
-//
+
 //    private void openFileFromFilePicker(final Uri uri) {
 //        if (helper != null) {
 //            Log.d(TAG, "Opening " + uri.getPath());

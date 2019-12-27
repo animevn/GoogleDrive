@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -26,9 +25,7 @@ import com.haanhgs.googledrivedemo.helper.DriveServiceHelper;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.Item;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
-
 import java.util.Collections;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -39,7 +36,6 @@ import androidx.lifecycle.ViewModelProviders;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentHome extends Fragment {

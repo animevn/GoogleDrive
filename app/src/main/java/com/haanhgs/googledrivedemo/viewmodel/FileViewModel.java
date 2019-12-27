@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 public class FileViewModel extends ViewModel {
 
-    private MutableLiveData<Files> filesData = new MutableLiveData<>();
+    private final MutableLiveData<Files> filesData = new MutableLiveData<>();
 
     public MutableLiveData<Files> getFilesData() {
         return filesData;

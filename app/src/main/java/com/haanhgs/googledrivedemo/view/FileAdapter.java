@@ -5,15 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import com.google.api.services.drive.model.File;
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.helper.DriveServiceHelper;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.Item;
-
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
@@ -61,12 +57,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Item file = files.getFileList().get(position);
         holder.tvFile.setText(file.getFilename());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openDetail(position);
-            }
-        });
+        holder.itemView.setOnClickListener(v -> openDetail(position));
     }
 
     @Override

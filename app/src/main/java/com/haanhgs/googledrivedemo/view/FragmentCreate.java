@@ -2,17 +2,19 @@ package com.haanhgs.googledrivedemo.view;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.helper.DriveServiceHelper;
 import com.haanhgs.googledrivedemo.model.Files;
+import com.haanhgs.googledrivedemo.model.Item;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,8 +25,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class FragmentDetail extends Fragment {
+public class FragmentCreate extends Fragment {
 
+    private static final String TAG = "D.FragmentDetail";
     @BindView(R.id.etTitle)
     EditText etTitle;
     @BindView(R.id.etContent)
@@ -32,54 +35,23 @@ public class FragmentDetail extends Fragment {
     @BindView(R.id.bnSave)
     Button bnSave;
 
-    private static final String TAG = "D.FragmentDetail";
     private DriveServiceHelper helper;
     private FileViewModel viewModel;
     private Files files;
-    private int position;
     private FragmentManager manager;
     private FragmentActivity activity;
+    private Context context;
 
     public void setHelper(DriveServiceHelper helper) {
         this.helper = helper;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        this.context = context;
         manager = getFragmentManager();
         activity = getActivity();
-    }
-
-    private void readFile(String fileID) {
-        if (helper != null) {
-            Log.d(TAG, "Reading file " + fileID);
-            helper.readFile(fileID).addOnSuccessListener(nameAndContent -> {
-                String name = nameAndContent.first;
-                String content = nameAndContent.second;
-                etTitle.setText(name);
-                etContent.setText(content);
-            }).addOnFailureListener(exception ->
-                    Log.e(TAG, "Couldn't read file.", exception));
-        }
-    }
-
-    private void saveFile(String fileID) {
-        if (helper != null && fileID != null) {
-            String fileName = etTitle.getText().toString();
-            String fileContent = etContent.getText().toString();
-            files.getFileList().get(position).setFilename(fileName);
-            helper.saveFile(fileID, fileName, fileContent).addOnSuccessListener(aVoid -> {
-                Fragment fragment = manager.findFragmentByTag("detail");
-                manager.popBackStack();
-                viewModel.setFilesData(files);
-            }).addOnFailureListener(exception ->
-                    Log.e(TAG, "Unable to save file via REST.", exception));
-        }
     }
 
     @Nullable
@@ -90,15 +62,40 @@ public class FragmentDetail extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
         viewModel = ViewModelProviders.of(activity).get(FileViewModel.class);
-        viewModel.getFilesData().observe(this, files -> {
-            FragmentDetail.this.files = files;
-            readFile(files.getFileList().get(position).getFileId());
-        });
+        viewModel.getFilesData().observe(this, files -> FragmentCreate.this.files = files);
         return view;
     }
 
+        private void saveFileWhenCreated(String fileId) {
+        String title = etTitle.getText().toString();
+        String content = etContent.getText().toString();
+        helper.saveFile(fileId, title, content)
+                .addOnFailureListener(e -> Log.e(TAG, "Couldn't read file.", e))
+                .addOnSuccessListener(aVoid -> {
+                    Fragment fragment = manager.findFragmentByTag("create");
+                    manager.popBackStack();
+                    files.getFileList().add(new Item(fileId, title));
+                    viewModel.setFilesData(files);
+                });
+    }
+
+    private void createFile() {
+        if (helper != null) {
+            Log.d(TAG, "Creating a file.");
+            if (!TextUtils.isEmpty(etTitle.getText())) {
+                String filename = etTitle.getText().toString();
+                helper.createFile(filename)
+                        .addOnSuccessListener(this::saveFileWhenCreated)
+                        .addOnFailureListener(exception ->
+                                Log.e(TAG, "Couldn't create file.", exception));
+            } else {
+                Toast.makeText(context, "empty filename", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     @OnClick(R.id.bnSave)
-    public void onViewClicked(){
-        saveFile(files.getFileList().get(position).getFileId());
+    public void onViewClicked() {
+        createFile();
     }
 }
