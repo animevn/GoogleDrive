@@ -7,4 +7,5 @@
     <string name="signout">Logout</string>
     <string name="hintName">Filename</string>
     <string name="hintContent">Content</string>
+    <string name="holder">holder</string>
 </resources>
