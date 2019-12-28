@@ -19,10 +19,8 @@ public class FileViewModel extends ViewModel {
     }
 
     public void setFiles(String fileId, String filename) {
-        if (filesData.getValue() == null){
-            Files files = new Files();
-            files.getFileList().add(new Item(fileId, filename));
-            filesData.setValue(files);
-        }
+        Files files = filesData.getValue() == null ? new Files() : filesData.getValue();
+        files.getFileList().add(new Item(fileId, filename));
+        filesData.setValue(files);
     }
 }
