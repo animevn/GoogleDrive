@@ -47,7 +47,6 @@ public class FragmentHome extends Fragment {
 
     private static final String TAG = "D.FragmentHome";
     private static final int SIGN_IN = 1;
-    private static final int OPEN_DOCUMENT = 2;
 
     private GoogleSignInClient client;
     private DriveServiceHelper helper;
@@ -130,10 +129,9 @@ public class FragmentHome extends Fragment {
     }
 
     private void handleSignInResult(Intent result) {
-        GoogleSignIn.getSignedInAccountFromIntent(result).addOnSuccessListener(googleAccount -> {
-            Log.d(TAG, "Signed in as " + googleAccount.getEmail());
-            helper = new DriveServiceHelper(getDrive(googleAccount));
-        }).addOnFailureListener(exception -> Log.e(TAG, "Unable to sign in.", exception));
+        GoogleSignIn.getSignedInAccountFromIntent(result)
+                .addOnSuccessListener(account -> helper = new DriveServiceHelper(getDrive(account)))
+                .addOnFailureListener(exception -> Log.e(TAG, "Unable to sign in.", exception));
     }
 
     @Override

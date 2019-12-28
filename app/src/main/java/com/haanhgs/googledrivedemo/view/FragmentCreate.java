@@ -66,7 +66,7 @@ public class FragmentCreate extends Fragment {
         return view;
     }
 
-        private void saveFileWhenCreated(String fileId) {
+    private void saveFileWhenCreated(String fileId) {
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
         helper.saveFile(fileId, title, content)
