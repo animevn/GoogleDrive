@@ -32,6 +32,7 @@ public class DriveServiceHelper {
     public Task<String> createFolder() {
         return Tasks.call(executor, () -> {
             File metadata = new File()
+                    .setParents(Collections.singletonList("appDataFolder"))
                     .setMimeType("application/vnd.google-apps.folder")
                     .setName("Drive Demo");
 
@@ -39,7 +40,6 @@ public class DriveServiceHelper {
             if (googleFile == null) {
                 throw new IOException("Null result when requesting file creation.");
             }
-
             return googleFile.getId();
         });
     }
@@ -47,7 +47,6 @@ public class DriveServiceHelper {
     public Task<String> createFile(final String filename) {
         return Tasks.call(executor, () -> {
             File metadata = new File()
-//                        .setParents(Collections.singletonList("root"))
                     .setParents(Collections.singletonList("appDataFolder"))
                     .setMimeType("text/plain")
                     .setName(filename);
@@ -96,7 +95,6 @@ public class DriveServiceHelper {
         return Tasks.call(executor, () ->
                 driveService.files().list().setSpaces("appDataFolder").execute());
     }
-
 
 
     //check later
