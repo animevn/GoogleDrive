@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Collections;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -90,8 +88,8 @@ public class DriveHelper {
         });
     }
 
-    public Task<Void> deleteFile(String fileId){
-        return Tasks.call(executor, ()->{
+    public void deleteFile(String fileId){
+        Tasks.call(executor, () -> {
             drive.files().delete(fileId).execute();
             return null;
         });
