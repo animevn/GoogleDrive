@@ -3,4 +3,10 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="tag1">#FFE8EA</color>
+    <color name="base1_start">#fa5c5c</color>
+    <color name="base1">#FA2828</color>
+    <color name="base1_dark">#db0202</color>
+
 </resources>

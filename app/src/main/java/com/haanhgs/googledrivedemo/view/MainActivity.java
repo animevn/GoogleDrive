@@ -3,19 +3,14 @@ package com.haanhgs.googledrivedemo.view;
 import android.os.Bundle;
 import com.haanhgs.googledrivedemo.R;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        FragmentHome fragmentHome = new FragmentHome();
-        ft.replace(R.id.flMain, fragmentHome, "home");
-        ft.commit();
+
     }
 
 
