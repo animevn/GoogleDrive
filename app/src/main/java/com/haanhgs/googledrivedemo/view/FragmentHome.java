@@ -13,16 +13,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.MyFile;
@@ -35,12 +33,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
 import static android.app.Activity.RESULT_OK;
 
 public class FragmentHome extends Fragment {
@@ -63,7 +59,9 @@ public class FragmentHome extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         activity = getActivity();
-        manager = getFragmentManager();
+        if (activity != null){
+            manager = activity.getSupportFragmentManager();
+        }
     }
 
     private void initGoogleSignIn(){
@@ -79,8 +77,14 @@ public class FragmentHome extends Fragment {
         GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(
                 activity, Collections.singleton(DriveScopes.DRIVE_APPDATA));
         credential.setSelectedAccount(account.getAccount());
+
+        //Can use HttpTransport
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
-        return new Drive.Builder(transport, new GsonFactory(), credential)
+
+        //or NethttpTransport
+        NetHttpTransport transport1 = new NetHttpTransport();
+
+        return new Drive.Builder(transport1, new GsonFactory(), credential)
                 .setApplicationName("Drive Demo").build();
     }
 
@@ -114,7 +118,7 @@ public class FragmentHome extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         ButterKnife.bind(this, view);
-        viewModel = ViewModelProviders.of(activity).get(FileViewModel.class);
+        viewModel = new ViewModelProvider(activity).get(FileViewModel.class);
         initGoogleSignIn();
         createDriveHelper();
         return view;
@@ -133,16 +137,18 @@ public class FragmentHome extends Fragment {
     }
 
     private void openFragmentList(){
-        FragmentTransaction ft = manager.beginTransaction();
-        Fragment fragment = manager.findFragmentByTag("list");
-        if (fragment == null){
-            FragmentList fragmentList = new FragmentList();
-            fragmentList.setHelper(helper);
-            ft.replace(R.id.flMain, fragmentList, "list");
-            ft.addToBackStack(null);
-            ft.commit();
-        }else {
-            ft.attach(fragment);
+        if (manager != null){
+            FragmentTransaction ft = manager.beginTransaction();
+            Fragment fragment = manager.findFragmentByTag("list");
+            if (fragment == null){
+                FragmentList fragmentList = new FragmentList();
+                fragmentList.setHelper(helper);
+                ft.replace(R.id.flMain, fragmentList, "list");
+                ft.addToBackStack(null);
+                ft.commit();
+            }else {
+                ft.attach(fragment);
+            }
         }
     }
 

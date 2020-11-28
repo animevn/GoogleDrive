@@ -10,19 +10,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.MyFile;
 import com.haanhgs.googledrivedemo.repo.DriveHelper;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -52,8 +50,10 @@ public class FragmentCreate extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
-        manager = getFragmentManager();
         activity = getActivity();
+        if (activity != null){
+            manager = activity.getSupportFragmentManager();
+        }
     }
 
     @Nullable
@@ -63,7 +63,7 @@ public class FragmentCreate extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
-        viewModel = ViewModelProviders.of(activity).get(FileViewModel.class);
+        viewModel = new ViewModelProvider(activity).get(FileViewModel.class);
         viewModel.getFilesData().observe(this, files -> this.files = files);
         return view;
     }
@@ -71,14 +71,16 @@ public class FragmentCreate extends Fragment {
     private void saveFileWhenCreated(String fileId) {
         String title = etTitle.getText().toString();
         String content = etContent.getText().toString();
-        helper.saveFile(fileId, title, content)
-                .addOnFailureListener(e -> Log.e(TAG, "Couldn't read file.", e))
-                .addOnSuccessListener(aVoid -> {
-                    Fragment fragment = manager.findFragmentByTag("create");
-                    manager.popBackStack();
-                    files.getFileList().add(new MyFile(fileId, title));
-                    viewModel.setFilesData(files);
-                });
+        if (manager != null){
+            helper.saveFile(fileId, title, content)
+                    .addOnFailureListener(e -> Log.e(TAG, "Couldn't read file.", e))
+                    .addOnSuccessListener(aVoid -> {
+                        Fragment fragment = manager.findFragmentByTag("create");
+                        manager.popBackStack();
+                        files.getFileList().add(new MyFile(fileId, title));
+                        viewModel.setFilesData(files);
+                    });
+        }
     }
 
     private void createFile() {

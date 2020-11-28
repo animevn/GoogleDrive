@@ -1,6 +1,5 @@
 package com.haanhgs.googledrivedemo.view;
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import com.haanhgs.googledrivedemo.R;

@@ -26,7 +26,7 @@ public class DriveHelper {
 //    private final Executor executor = Executors.newSingleThreadExecutor();
     private final ThreadPoolExecutor executor = new ThreadPoolExecutor(2, 8, 60, TimeUnit.SECONDS,
         new LinkedBlockingQueue<>());
-    private Drive drive;
+    private final Drive drive;
 
     public DriveHelper(Drive drive){
         this.drive = drive;
@@ -88,6 +88,7 @@ public class DriveHelper {
         });
     }
 
+    @SuppressWarnings("SameReturnValue")
     public void deleteFile(String fileId){
         Tasks.call(executor, () -> {
             drive.files().delete(fileId).execute();

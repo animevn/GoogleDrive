@@ -8,18 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.repo.DriveHelper;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -52,8 +50,10 @@ public class FragmentDetail extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        manager = getFragmentManager();
         activity = getActivity();
+        if (activity != null){
+            manager = activity.getSupportFragmentManager();
+        }
     }
 
     private void readFile(String fileID) {
@@ -70,7 +70,7 @@ public class FragmentDetail extends Fragment {
     }
 
     private void saveFile(String fileID) {
-        if (helper != null && fileID != null) {
+        if (manager != null && helper != null && fileID != null) {
             String fileName = etTitle.getText().toString();
             String fileContent = etContent.getText().toString();
             files.getFileList().get(position).setFilename(fileName);
@@ -90,7 +90,7 @@ public class FragmentDetail extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         ButterKnife.bind(this, view);
-        viewModel = ViewModelProviders.of(activity).get(FileViewModel.class);
+        viewModel = new ViewModelProvider(activity).get(FileViewModel.class);
         viewModel.getFilesData().observe(this, files -> {
             FragmentDetail.this.files = files;
             readFile(files.getFileList().get(position).getFileId());

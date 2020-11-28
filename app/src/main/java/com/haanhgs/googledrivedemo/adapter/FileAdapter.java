@@ -9,7 +9,6 @@ import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.MyFile;
 import com.haanhgs.googledrivedemo.repo.DriveHelper;
 import com.haanhgs.googledrivedemo.view.FragmentDetail;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;

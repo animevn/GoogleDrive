@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="tag1">#FFE8EA</color>
+    <color name="tag1" tools:keep="@color/tag1">#FFE8EA</color>
     <color name="base1_start">#fa5c5c</color>
     <color name="base1">#FA2828</color>
     <color name="base1_dark">#db0202</color>

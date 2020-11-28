@@ -6,22 +6,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.haanhgs.googledrivedemo.R;
 import com.haanhgs.googledrivedemo.adapter.FileAdapter;
 import com.haanhgs.googledrivedemo.model.Files;
 import com.haanhgs.googledrivedemo.model.MyFile;
 import com.haanhgs.googledrivedemo.repo.DriveHelper;
 import com.haanhgs.googledrivedemo.viewmodel.FileViewModel;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,7 +50,9 @@ public class FragmentList extends Fragment {
         super.onAttach(context);
         this.context = context;
         activity = getActivity();
-        manager = getFragmentManager();
+        if (activity != null){
+            manager = activity.getSupportFragmentManager();
+        }
     }
 
     private void initRecyclerView(){
@@ -104,25 +103,27 @@ public class FragmentList extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         ButterKnife.bind(this, view);
-        viewModel = ViewModelProviders.of(activity).get(FileViewModel.class);
+        viewModel = new ViewModelProvider(activity).get(FileViewModel.class);
         initRecyclerView();
         setSwipe();
         return view;
     }
 
     private void openCreate(){
-        FragmentTransaction ft = manager.beginTransaction();
-        Fragment fragment = manager.findFragmentByTag("create");
-        if (fragment == null){
-            FragmentCreate fragmentCreate = new FragmentCreate();
-            fragmentCreate.setHelper(helper);
-            ft.replace(R.id.flMain, fragmentCreate, "create");
-            ft.addToBackStack(null);
-            ft.commit();
-        }else {
-            ft.attach(fragment);
-        }
+        if (manager != null){
+            FragmentTransaction ft = manager.beginTransaction();
+            Fragment fragment = manager.findFragmentByTag("create");
+            if (fragment == null){
+                FragmentCreate fragmentCreate = new FragmentCreate();
+                fragmentCreate.setHelper(helper);
+                ft.replace(R.id.flMain, fragmentCreate, "create");
+                ft.addToBackStack(null);
+                ft.commit();
+            }else {
+                ft.attach(fragment);
+            }
 
+        }
     }
 
     @OnClick(R.id.bnCreate)
